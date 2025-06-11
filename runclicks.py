@@ -8,9 +8,19 @@ import numpy as np
 from PIL import ImageGrab, ImageFont, ImageTk
 import os
 import threading
+import tkinter.font as tkfont 
+import keyboard 
 
 stop_flag = False  # ใช้ควบคุมการหยุดคลิก
-
+def monitor_hotkey():
+    global stop_flag
+    while True:
+        if keyboard.is_pressed('s'):
+            stop_flag = True
+            print("🛑 หยุดโดยกดปุ่ม S")
+            break
+        time.sleep(0.1)
+        
 def find_image_on_screen(target_path, threshold=0.6):
     screen = np.array(ImageGrab.grab())
     screen_gray = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
@@ -104,9 +114,15 @@ def start_gui():
                 raise ValueError
             save_settings(loop, delay)
             status_label.config(text="🟢 กำลังทำงาน...", fg="blue")
+            
+            # เริ่มฟัง hotkey S (global)
+            threading.Thread(target=monitor_hotkey, daemon=True).start()
+
+            # เริ่มคลิก
             threading.Thread(target=run_clicks, args=(loop, delay, status_label), daemon=True).start()
         except ValueError:
             messagebox.showerror("ข้อผิดพลาด", "กรุณาใส่ค่าที่ถูกต้อง เช่น จำนวนรอบ > 0 และดีเลย์ >= 0")
+
 
     def on_save_settings():
         try:
@@ -123,11 +139,15 @@ def start_gui():
         global stop_flag
         stop_flag = True
         status_label.config(text="🛑 กำลังหยุด...", fg="orange")
+        
+    def on_key_press(event):
+        if event.char.lower() == 's':
+            on_stop()
 
     # สร้างหน้าต่างหลัก
     root = tk.Tk()
     root.title("🖱️ Auto Clicker")
-    root.geometry("400x350")
+    root.geometry("400x450")
     root.configure(bg="#f5f5f5")
 
     # ฟอนต์ Kanit
@@ -168,7 +188,10 @@ def start_gui():
     # สถานะ
     status_label = tk.Label(root, text="🕒 รอเริ่ม", font=kanit_font, fg="gray", bg="#f5f5f5")
     status_label.pack(pady=15)
-
+    description = tk.Label(root, text="💡 กดปุ่ม 'S' บนคีย์บอร์ดเพื่อหยุดการทำงานได้ทุกเมื่อ", font=("Kanit", 10), fg="black", bg="#f5f5f5")
+    description.pack(pady=5)
+    # หากมีการกดคีย์บอร์ดและกดเป็น s ให้หยุดการทำงาน
+    root.bind_all("<Key>", on_key_press)
     root.mainloop()
 
 if __name__ == "__main__":
