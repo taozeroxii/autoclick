@@ -1,0 +1,34 @@
+[
+  {
+    "type": "point",
+    "pos": [
+      463,
+      263
+    ]
+  },
+  {
+    "type": "image",
+    "file": "img1.png"
+  },
+  {
+    "type": "point",
+    "pos": [
+      1240,
+      889
+    ]
+  },
+  {
+    "type": "point",
+    "pos": [
+      1557,
+      226
+    ]
+  },
+  {
+    "type": "point",
+    "pos": [
+      1547,
+      337
+    ]
+  }
+]
